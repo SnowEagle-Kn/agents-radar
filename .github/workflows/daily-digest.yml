@@ -78,24 +78,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Probe token models
-        env:
-          KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: |
-          echo "=== /v1/models status ==="
-          curl -s -o /tmp/models.json -w "%{http_code}\n" https://api.ziyelian.site/v1/models -H "Authorization: Bearer $KEY"
-          echo "=== model ids visible to this token ==="
-          tr ',' '\n' < /tmp/models.json | grep -o '"id":"[^"]*"' | sed 's/"id":"//;s/"//' | sort | head -80
-          echo "=== raw head (first 300 chars) ==="
-          head -c 300 /tmp/models.json
-
       - name: Run daily digest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_PROVIDER: openai
           OPENAI_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           OPENAI_BASE_URL: https://api.ziyelian.site/v1
-          OPENAI_MODEL: deepseek-v4.1-flash-1017
+          OPENAI_MODEL: deepseek-v4.1-flash
           PRODUCTHUNT_TOKEN: ${{ secrets.PRODUCTHUNT_TOKEN }}
           DIGEST_REPO: ${{ github.repository }}
         run: pnpm start
