@@ -78,6 +78,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Probe available models
+        env:
+          KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          echo "http:"
+          curl -s -o /tmp/models.json -w "%{http_code}\n" https://api.ziyelian.site/v1/models -H "Authorization: Bearer $KEY"
+          echo "deepseek models visible to this token:"
+          tr ',' '\n' < /tmp/models.json | grep -o '"id":"[^"]*"' | grep -i deepseek | head -50
+          echo "--- raw head ---"
+          head -c 500 /tmp/models.json
+
       - name: Run daily digest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
